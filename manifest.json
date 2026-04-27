@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "FJU Diagnosis Bridge",
+  "version": "0.1.0",
+  "description": "抓取課程診斷頁資料並傳回系統頁",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://learningcounseling.fju.edu.tw/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://learningcounseling.fju.edu.tw/Student/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

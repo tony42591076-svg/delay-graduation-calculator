@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>延畢計算機</title>
+  <title>延畢計算機｜資管系 112 版</title>
   <style>
     :root{
-      --bg:#0b1220; --bg2:#111b30; --panel:#15213d; --panel2:#1a2a4d; --line:#2f4273;
+      --bg:#0b1220; --panel:#15213d; --panel2:#1a2a4d; --line:#2f4273;
       --text:#eef4ff; --muted:#9fb1d8; --blue:#78a6ff; --blue2:#4d83ff; --green:#72e1b3;
-      --amber:#ffc86d; --danger:#ff9595;
+      --amber:#ffc86d; --danger:#ff9c9c;
     }
     *{box-sizing:border-box}
     body{
@@ -17,7 +17,7 @@
       background:linear-gradient(180deg,#0b1220,#101a30 45%,#0b1220);
       color:var(--text)
     }
-    .wrap{max-width:1280px;margin:0 auto;padding:24px}
+    .wrap{max-width:1320px;margin:0 auto;padding:24px}
     .top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
     .title{font-size:36px;font-weight:900}
     .sub{color:var(--muted);line-height:1.7}
@@ -29,25 +29,84 @@
     .status{margin-bottom:14px;color:var(--muted)}
 
     .student{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
-    .info,.card,.block,.progressCard{
+    .info,.card,.block,.progressCard,.manualCard,.noticeCard{
       background:var(--panel2);
       border:1px solid var(--line);
       border-radius:18px;
       padding:14px
     }
-    .info .k,.card .k,.progressCard .k{font-size:12px;color:var(--muted);margin-bottom:8px}
+    .info .k,.card .k,.progressCard .k,.manualTitle .k,.noticeCard .k{
+      font-size:12px;color:var(--muted);margin-bottom:8px
+    }
     .info .v{font-weight:800;line-height:1.6}
 
     .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
     .card .v{font-size:30px;font-weight:900}
 
-    .progressSection{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+    .progressSection{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
     .progressTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px}
     .progressTop .name{font-size:15px;font-weight:800}
     .progressTop .num{font-size:13px;color:var(--muted)}
     .bar{height:12px;border-radius:999px;background:#0d1731;border:1px solid var(--line);overflow:hidden}
     .barFill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--blue),var(--green));width:0%}
     .progressMeta{margin-top:8px;font-size:12px;color:var(--muted)}
+
+    .manualWrap{margin-bottom:18px}
+    .manualHeader{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px}
+    .manualTitle .title2{font-size:18px;font-weight:900;margin-bottom:6px}
+    .manualDesc{color:var(--muted);font-size:13px;line-height:1.6}
+    .manualGrid{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+    .manualInputs{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .field{display:flex;flex-direction:column;gap:8px}
+    .field label{font-size:13px;color:var(--muted);font-weight:700}
+    .field select,.field input{
+      width:100%;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#0c1430;
+      color:var(--text)
+    }
+    .manualSummaryBox{display:flex;flex-direction:column;gap:12px}
+    .summaryBig{font-size:18px;font-weight:900}
+    .summarySmall{color:var(--muted);font-size:13px;line-height:1.7}
+
+    .englishCourseList{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+    }
+    .englishCourseItem{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#122041;
+      cursor:pointer;
+    }
+    .englishCourseItem input{
+      width:auto;
+      margin-top:4px;
+      padding:0;
+    }
+    .englishCourseMeta{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      line-height:1.5;
+    }
+    .englishCourseMeta .title{
+      font-size:14px;
+      font-weight:700;
+      line-height:1.4;
+    }
+    .englishCourseMeta .sub{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.5;
+    }
 
     .toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
     .tabs{display:flex;gap:10px;flex-wrap:wrap}
@@ -65,18 +124,15 @@
 
     .muted{color:var(--muted)}
     .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-
     .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
     .chip{padding:5px 10px;border-radius:999px;background:#24386a;border:1px solid #39518f;font-size:12px}
     .chip.good{background:#173b2d;border-color:#2d6953}
     .chip.warn{background:#503b18;border-color:#856224}
-
+    .chip.bad{background:#442024;border-color:#7a3940}
     .name{font-size:18px;font-weight:900;line-height:1.35;margin-bottom:10px}
-
     table{width:100%;border-collapse:collapse}
     th,td{padding:8px 6px;border-bottom:1px solid #2b3960;text-align:left;font-size:13px}
     th{color:var(--muted);font-weight:700}
-
     .empty{
       padding:36px;
       text-align:center;
@@ -84,7 +140,6 @@
       border:1px dashed var(--line);
       border-radius:18px
     }
-
     .substituteBox{
       margin-top:10px;
       border:1px solid #35507f;
@@ -92,14 +147,23 @@
       border-radius:14px;
       padding:10px 12px;
     }
-
     .hidden{display:none!important}
+    .noticeList{
+      margin:0;
+      padding-left:18px;
+      color:var(--muted);
+      line-height:1.8;
+      font-size:13px;
+    }
 
     @media (max-width:980px){
       .student{grid-template-columns:1fr}
       .cards{grid-template-columns:repeat(2,1fr)}
-      .progressSection{grid-template-columns:repeat(2,1fr)}
+      .progressSection{grid-template-columns:1fr}
+      .manualGrid{grid-template-columns:1fr}
+      .manualInputs{grid-template-columns:1fr}
       .grid{grid-template-columns:1fr}
+      .englishCourseList{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -108,12 +172,26 @@
   <div class="top">
     <div>
       <div class="title">延畢計算機</div>
-      <div class="sub">登入官方課診系統後，自動同步修課資料並展示。</div>
+      <div class="sub">資管系 112 學年度版本｜官方課診資料自動同步 + 特殊條件人工確認</div>
     </div>
     <div class="row">
       <button class="btn primary" id="connectBtn">連接官方課診系統</button>
+      <button class="btn ghost" id="logoutBtn">登出官方系統</button>
       <button class="btn ghost" id="clearBtn">清空畫面</button>
     </div>
+  </div>
+
+  <div class="noticeCard" style="margin-bottom:18px;">
+    <div class="k">首次使用前請先安裝擴充功能</div>
+    <ul class="noticeList">
+      <li>1. 開啟 Chrome 瀏覽器</li>
+      <li>2. 進入 chrome://extensions/</li>
+      <li>3. 開啟右上角「開發人員模式」</li>
+      <li>4. 點選「載入未封裝項目」</li>
+      <li>5. 選擇本專題的 extension 資料夾</li>
+      <li>6. 確認擴充功能已啟用</li>
+      <li>7. 回到本頁後，再點選「連接官方課診系統」</li>
+    </ul>
   </div>
 
   <div class="panel">
@@ -133,11 +211,81 @@
       <div class="cards">
         <div class="card"><div class="k">目前已通過學分（粗估）</div><div class="v" id="statEarned">0</div></div>
         <div class="card"><div class="k">尚待補足學分（粗估）</div><div class="v" id="statPending">0</div></div>
-        <div class="card"><div class="k">檢核項目數</div><div class="v" id="statBlocks">0</div></div>
+        <div class="card"><div class="k">畢業要求項目數</div><div class="v" id="statBlocks">0</div></div>
         <div class="card"><div class="k">已抓取課程數</div><div class="v" id="statCourses">0</div></div>
       </div>
 
       <div class="progressSection" id="progressSection"></div>
+
+      <div class="manualWrap" id="manualWrap">
+        <div class="manualHeader">
+          <div class="manualTitle">
+            <div class="k">需人工確認項目</div>
+            <div class="title2">特殊畢業條件</div>
+            <div class="manualDesc">
+              依 112 資管系規則，以下條件不適合只靠課診頁自動判斷，因此改由使用者人工確認。
+            </div>
+          </div>
+        </div>
+
+        <div class="manualGrid">
+          <div class="manualCard">
+            <div class="manualInputs">
+              <div class="field">
+                <label for="subjectAbilityStatus">資訊學科學習能力檢測</label>
+                <select id="subjectAbilityStatus">
+                  <option value="">請選擇</option>
+                  <option value="passed">已通過</option>
+                  <option value="failed">未通過</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="englishGraduationStatus">英文畢業條件</label>
+                <select id="englishGraduationStatus">
+                  <option value="">請選擇</option>
+                  <option value="b2">已達 CEFR B2 / 檢定達標</option>
+                  <option value="selfstudy">已完成英語自學方案</option>
+                  <option value="failed">尚未完成</option>
+                </select>
+              </div>
+
+              <div class="field" style="grid-column:1 / -1;">
+                <label>英語授課專業課程（從已同步課程中勾選）</label>
+                <div id="englishTaughtCourseBox" style="border:1px solid var(--line);border-radius:14px;padding:12px;background:#0c1430;min-height:84px">
+                  <div class="muted">尚未載入可選課程</div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="programmingTestStatus">程式語言機測</label>
+                <select id="programmingTestStatus">
+                  <option value="">請選擇</option>
+                  <option value="passed">已通過</option>
+                  <option value="substitute">未通過，但已累計 3 題且已修畢程式設計相關選修</option>
+                  <option value="failed">尚未完成</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="manualCard manualSummaryBox">
+            <div id="manualChips" class="chips"></div>
+            <div class="summaryBig" id="manualSummaryTitle">尚未設定特殊畢業條件</div>
+            <div class="summarySmall" id="manualSummaryText">請先完成人工確認欄位。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="noticeCard" style="margin-bottom:18px;">
+        <div class="k">規則提醒</div>
+        <ul class="noticeList">
+          <li>本版優先讀取雲端 API 規則，若雲端載入失敗則自動改用本地備援規則。</li>
+          <li>「必選」不列為資管系獨立畢業類別，只保留官方頁原始資料分頁供檢視。</li>
+          <li>本系專業選修目前以「其它」分頁中註記為本系或對應選修清單的已通過課程做粗估。</li>
+          <li>擋修規則先作提示，不納入這版自動判定。</li>
+        </ul>
+      </div>
 
       <div class="toolbar">
         <div class="tabs" id="tabs"></div>
@@ -154,37 +302,61 @@
   let popupRef = null;
   let fullData = null;
   let activeTab = '';
+  let syncTimeout = null;
+  let ruleSource = 'local';
 
   const GUIDE_URL = 'https://learningcounseling.fju.edu.tw/Student/GuidePage';
+  const LOGOUT_URL = 'https://learningcounseling.fju.edu.tw/Student/GuidePage?bridge_action=logout';
+  const RULE_API_BASE = 'https://mis-rule-api.onrender.com';
   const TAB_ORDER = ['全人/校定', '必修', '必選', '其它'];
+  const MANUAL_STATE_KEY = 'delay_graduation_mis112_manual_state_v3';
 
-  /*
-    你只需要改這裡的規則
-    1. totalRequiredCredits 目前總學分先設 128
-    2. 必選 A/B 二選一規則
-    3. 替代課規則
-  */
-  const FRONTEND_RULES = {
+  const DEFAULT_RULES = {
     totalRequiredCredits: 128,
-    hideEmptyTabs: true,
-    choiceGroups: {
-      '必選': [
-        {
-          name: 'A類',
-          requiredCredits: 3,
-          options: [
-            '行動軟體設計與開發',
-            '行動APP程式設計'
-          ]
-        },
-        {
-          name: 'B類',
-          requiredCredits: 3,
-          options: [
-            '多媒體互動設計',
-            '互動控制程式設計'
-          ]
-        }
+    categories: {
+      generalCore: { label: '全人教育核心', required: 8 },
+      basicSkills: { label: '基本能力', required: 12 },
+      generalEducation: { label: '通識涵養', required: 12 },
+      required: { label: '專業必修', required: 64 },
+      electives: { label: '本系專業選修', required: 10 },
+      total: { label: '總學分', required: 128 }
+    },
+    courseMaps: {
+      generalCore: [
+        '大學入門',
+        '人生哲學',
+        '專業倫理'
+      ],
+      basicSkills: [
+        '國文（一）','國文（二）','外國語文（一）','外國語文（二）',
+        '主題英文','第二外語','資訊素養','體育（一）','體育（二）','體育（三）','體育（四）',
+        '國文','外國語文','體育'
+      ],
+      generalEducation: {
+        humanitiesArts: [
+          '電影藝術賞析','音樂欣賞','藝術與人生','美學概論','文學閱讀',
+          '戲劇欣賞','設計文化','台灣文學','哲學思維','宗教文化'
+        ],
+        socialScience: [
+          '心理學概論','經濟學概論','法律與生活','政治學概論','社會學',
+          '媒體與社會','人際關係','教育與社會','消費者行為','管理與生活'
+        ],
+        naturalTech: [
+          'AI與生活','環境科學','科技與社會','自然科學概論','資訊安全',
+          '生命科學','永續發展','能源與科技','天文科學','數位科技應用'
+        ]
+      },
+      requiredCourses: [
+        '微積分','會計學','經濟學','計算機概論','程式設計','資料結構','管理學','統計學',
+        '資料庫管理','資訊管理導論','系統分析與設計','作業系統','計算機網路','物件導向程式設計',
+        '電子商務','資訊安全','人工智慧概論',
+        '專題製作(一)','專題製作(二)','專題製作（一）','專題製作（二）',
+        '資訊系統專題一','資訊系統專題二'
+      ],
+      electiveCourses: [
+        '資料探勘','雲端計算','Python程式設計','行動應用開發','網頁程式設計','商業智慧',
+        '大數據分析','機器學習','UI/UX設計','數位行銷','區塊鏈應用','深度學習',
+        '資訊視覺化','軟體測試與驗證','ERP企業資源規劃','資料科學應用','互動式網頁資料庫設計'
       ]
     },
     substitutions: {
@@ -197,7 +369,17 @@
     }
   };
 
+  let ACTIVE_RULES = cloneRules(DEFAULT_RULES);
+
+  const TAB_DISPLAY_NAMES = {
+    '全人/校定': '全人/校定',
+    '必修': '必修',
+    '必選': '必選（僅原始資料）',
+    '其它': '選修'
+  };
+
   const connectBtn = document.getElementById('connectBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
   const clearBtn = document.getElementById('clearBtn');
   const statusEl = document.getElementById('status');
   const emptyEl = document.getElementById('empty');
@@ -208,15 +390,181 @@
   const tabMeta = document.getElementById('tabMeta');
   const progressSection = document.getElementById('progressSection');
 
-  function safe(v, fallback='-'){ return v ?? fallback; }
+  const manualWrap = document.getElementById('manualWrap');
+  const subjectAbilityStatus = document.getElementById('subjectAbilityStatus');
+  const englishGraduationStatus = document.getElementById('englishGraduationStatus');
+  const englishTaughtCourseBox = document.getElementById('englishTaughtCourseBox');
+  const programmingTestStatus = document.getElementById('programmingTestStatus');
+  const manualChips = document.getElementById('manualChips');
+  const manualSummaryTitle = document.getElementById('manualSummaryTitle');
+  const manualSummaryText = document.getElementById('manualSummaryText');
 
-  function escapeHtml(str){
+  function cloneRules(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  function getRules() {
+    return ACTIVE_RULES || DEFAULT_RULES;
+  }
+
+  function safe(v, fallback='-') {
+    return v ?? fallback;
+  }
+
+  function escapeHtml(str) {
     return String(str ?? '')
-      .replaceAll('&','&amp;')
-      .replaceAll('<','&lt;')
-      .replaceAll('>','&gt;')
-      .replaceAll('"','&quot;')
-      .replaceAll("'","&#39;");
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
+
+  function resetView(statusText = '尚未同步') {
+    fullData = null;
+    activeTab = '';
+    tabsEl.innerHTML = '';
+    blocksEl.innerHTML = '';
+    progressSection.innerHTML = '';
+    searchInput.value = '';
+    appEl.classList.add('hidden');
+    emptyEl.classList.remove('hidden');
+    statusEl.textContent = statusText;
+    ruleSource = 'local';
+    ACTIVE_RULES = cloneRules(DEFAULT_RULES);
+  }
+
+  function normalizeName(text = '') {
+    return String(text)
+      .replace(/\s+/g, '')
+      .replace(/[（）]/g, m => (m === '（' ? '(' : ')'))
+      .replace(/Ⅰ/g, '1')
+      .replace(/Ⅱ/g, '2')
+      .replace(/Ⅲ/g, '3')
+      .replace(/Ⅳ/g, '4')
+      .trim();
+  }
+
+  function matchesAnyKeyword(text = '', keywords = []) {
+    const normalizedText = normalizeName(text);
+    return keywords.some(keyword => normalizedText.includes(normalizeName(keyword)));
+  }
+
+  function uniqueMerge(arr1 = [], arr2 = []) {
+    return Array.from(new Set([...(arr1 || []), ...(arr2 || [])])).filter(Boolean);
+  }
+
+  function buildRulesFromApi(apiData) {
+    const rules = cloneRules(DEFAULT_RULES);
+
+    if (!apiData || !apiData.rule) return rules;
+
+    if (Number.isFinite(Number(apiData.rule.total_required_credits))) {
+      rules.totalRequiredCredits = Number(apiData.rule.total_required_credits);
+      rules.categories.total.required = Number(apiData.rule.total_required_credits);
+    }
+
+    const categoryRows = Array.isArray(apiData.categories) ? apiData.categories : [];
+    const courseRows = Array.isArray(apiData.courses) ? apiData.courses : [];
+
+    const catMap = {};
+    for (const row of categoryRows) {
+      catMap[row.category_code] = row;
+    }
+
+    if (catMap.general_core) {
+      rules.categories.generalCore.label = catMap.general_core.category_name || rules.categories.generalCore.label;
+      rules.categories.generalCore.required = Number(catMap.general_core.required_credits) || rules.categories.generalCore.required;
+    }
+    if (catMap.basic_skills) {
+      rules.categories.basicSkills.label = catMap.basic_skills.category_name || rules.categories.basicSkills.label;
+      rules.categories.basicSkills.required = Number(catMap.basic_skills.required_credits) || rules.categories.basicSkills.required;
+    }
+    if (catMap.general_education) {
+      rules.categories.generalEducation.label = catMap.general_education.category_name || rules.categories.generalEducation.label;
+      rules.categories.generalEducation.required = Number(catMap.general_education.required_credits) || rules.categories.generalEducation.required;
+    }
+    if (catMap.required) {
+      rules.categories.required.label = catMap.required.category_name || rules.categories.required.label;
+      rules.categories.required.required = Number(catMap.required.required_credits) || rules.categories.required.required;
+    }
+    if (catMap.electives) {
+      rules.categories.electives.label = catMap.electives.category_name || rules.categories.electives.label;
+      rules.categories.electives.required = Number(catMap.electives.required_credits) || rules.categories.electives.required;
+    }
+
+    const generalCoreCourses = courseRows.filter(r => r.category_code === 'general_core').map(r => r.course_name);
+    const basicSkillCourses = courseRows.filter(r => r.category_code === 'basic_skills').map(r => r.course_name);
+    const generalEduCourses = courseRows.filter(r => r.category_code === 'general_education').map(r => r.course_name);
+    const requiredCourses = courseRows.filter(r => r.category_code === 'required').map(r => r.course_name);
+    const electiveCourses = courseRows.filter(r => r.category_code === 'electives').map(r => r.course_name);
+
+    rules.courseMaps.generalCore = uniqueMerge(rules.courseMaps.generalCore, generalCoreCourses);
+    rules.courseMaps.basicSkills = uniqueMerge(rules.courseMaps.basicSkills, basicSkillCourses);
+    rules.courseMaps.generalEducation.humanitiesArts = uniqueMerge(
+      uniqueMerge(rules.courseMaps.generalEducation.humanitiesArts, rules.courseMaps.generalEducation.socialScience),
+      uniqueMerge(rules.courseMaps.generalEducation.naturalTech, generalEduCourses)
+    );
+    rules.courseMaps.generalEducation.socialScience = [];
+    rules.courseMaps.generalEducation.naturalTech = [];
+    rules.courseMaps.requiredCourses = uniqueMerge(rules.courseMaps.requiredCourses, requiredCourses);
+    rules.courseMaps.electiveCourses = uniqueMerge(rules.courseMaps.electiveCourses, electiveCourses);
+
+    return rules;
+  }
+
+  async function fetchRuleFromApi(dept = 'MIS', year = 112) {
+    const res = await fetch(`${RULE_API_BASE}/api/rules/${dept}/${year}`);
+    if (!res.ok) {
+      throw new Error(`規則 API 錯誤：${res.status}`);
+    }
+    return await res.json();
+  }
+
+  function getBlockAndCourseNames(block) {
+    const names = [String(block.sectionName || '')];
+    for (const course of (block.courses || [])) {
+      names.push(String(course.courseName || ''));
+    }
+    return names;
+  }
+
+  function blockMatchesKeywords(block, keywords = []) {
+    return getBlockAndCourseNames(block).some(name => matchesAnyKeyword(name, keywords));
+  }
+
+  function courseMatchesKeywords(course, keywords = []) {
+    return matchesAnyKeyword(course.courseName || '', keywords);
+  }
+
+  function isGeneralCoreBlock(block) {
+    return blockMatchesKeywords(block, getRules().courseMaps.generalCore);
+  }
+
+  function isBasicSkillsBlock(block) {
+    return blockMatchesKeywords(block, getRules().courseMaps.basicSkills);
+  }
+
+  function isGeneralEducationBlock(block) {
+    const maps = getRules().courseMaps.generalEducation;
+    const allKeywords = [
+      ...(maps.humanitiesArts || []),
+      ...(maps.socialScience || []),
+      ...(maps.naturalTech || [])
+    ];
+
+    return (
+      matchesAnyKeyword(block.sectionName || '', ['通識領域']) ||
+      blockMatchesKeywords(block, allKeywords)
+    );
+  }
+
+  function isDepartmentElectiveCourse(course) {
+    const flags = course.flags || [];
+    return (
+      courseMatchesKeywords(course, getRules().courseMaps.electiveCourses) ||
+      flags.some(flag => String(flag).includes('本系'))
+    );
   }
 
   function tryParseBlockHeader(rawText = '') {
@@ -359,31 +707,8 @@
     return (tab.looseCourses || []).filter(isLooseCourseEligible);
   }
 
-  function blockTextForMatch(block) {
-    return [
-      block.categoryLabel,
-      block.sectionName,
-      block.raw,
-      block.note
-    ].join(' ').toLowerCase();
-  }
-
-  function blockMatchesOption(block, keyword) {
-    return blockTextForMatch(block).includes(String(keyword || '').toLowerCase());
-  }
-
-  function findChoiceGroupName(tabName, block) {
-    const groups = FRONTEND_RULES.choiceGroups?.[tabName] || [];
-    for (const group of groups) {
-      if ((group.options || []).some(option => blockMatchesOption(block, option))) {
-        return group.name;
-      }
-    }
-    return '';
-  }
-
   function findSubstitutionRule(tabName, block) {
-    const rules = FRONTEND_RULES.substitutions?.[tabName] || [];
+    const rules = getRules().substitutions?.[tabName] || [];
     return rules.find(rule =>
       String(block.sectionName || '').includes(String(rule.targetBlock || ''))
     ) || null;
@@ -421,20 +746,15 @@
     return pool;
   }
 
-  function computeRuleModel() {
-    const passedPool = getAllPassedCoursesPool();
+  function evaluateBlockFactory(passedPool) {
     const usedSubstituteCourseUIDs = new Set();
     const blockStatusMap = {};
-    const tabProgressMap = {};
 
     function evaluateBlock(tabName, block) {
-      if (blockStatusMap[block._uid]) {
-        return blockStatusMap[block._uid];
-      }
+      if (blockStatusMap[block._uid]) return blockStatusMap[block._uid];
 
       const courses = Array.isArray(block.courses) ? block.courses : [];
 
-      // 直接修過
       if (courses.length) {
         let directPassed = false;
 
@@ -445,17 +765,12 @@
         }
 
         if (directPassed) {
-          const status = {
-            passed: true,
-            mode: 'direct',
-            substituteCourses: []
-          };
+          const status = { passed: true, mode: 'direct', substituteCourses: [] };
           blockStatusMap[block._uid] = status;
           return status;
         }
       }
 
-      // 替代課
       const subRule = findSubstitutionRule(tabName, block);
       if (subRule) {
         const matched = passedPool.filter(course =>
@@ -468,7 +783,6 @@
 
         if (matched.length) {
           usedSubstituteCourseUIDs.add(matched[0]._uid);
-
           const status = {
             passed: true,
             mode: 'substitution',
@@ -479,168 +793,363 @@
         }
       }
 
-      const status = {
-        passed: false,
-        mode: 'none',
-        substituteCourses: []
-      };
+      const status = { passed: false, mode: 'none', substituteCourses: [] };
       blockStatusMap[block._uid] = status;
       return status;
     }
 
-    function getBaseRequiredForTab(tabName) {
-      const blocks = getMeaningfulBlocks(tabName);
-      const groups = FRONTEND_RULES.choiceGroups?.[tabName] || [];
-      const consumed = new Set();
-      let required = 0;
+    return { evaluateBlock, usedSubstituteCourseUIDs, blockStatusMap };
+  }
 
-      // 群組規則直接加總
-      for (const group of groups) {
-        required += Number(group.requiredCredits) || 0;
+  function computeRuleModel() {
+    const rules = getRules();
+    const passedPool = getAllPassedCoursesPool();
+    const { evaluateBlock, usedSubstituteCourseUIDs, blockStatusMap } = evaluateBlockFactory(passedPool);
+    const progressMap = {};
 
-        const matchedBlocks = blocks.filter(block =>
-          (group.options || []).some(option => blockMatchesOption(block, option))
-        );
-        matchedBlocks.forEach(block => consumed.add(block._uid));
-      }
+    const totals = {
+      generalCore: 0,
+      basicSkills: 0,
+      generalEducation: 0,
+      required: 0,
+      electives: 0
+    };
 
-      // 非群組區塊再加總
-      for (const block of blocks) {
-        if (consumed.has(block._uid)) continue;
-
-        const req = Number(block.requiredCredits);
-        if (!Number.isFinite(req) || req <= 0) continue;
-        required += req;
-      }
-
-      return required;
-    }
-
-    // 先算非「其它」
-    ['全人/校定', '必修', '必選'].forEach(tabName => {
-      const blocks = getMeaningfulBlocks(tabName);
-      const groups = FRONTEND_RULES.choiceGroups?.[tabName] || [];
-      const consumed = new Set();
-
-      let required = 0;
-      let earned = 0;
-
-      for (const group of groups) {
-        const groupRequired = Number(group.requiredCredits) || 0;
-        required += groupRequired;
-
-        const matchedBlocks = blocks.filter(block =>
-          (group.options || []).some(option => blockMatchesOption(block, option))
-        );
-
-        matchedBlocks.forEach(block => consumed.add(block._uid));
-
-        if (matchedBlocks.some(block => evaluateBlock(tabName, block).passed)) {
-          earned += groupRequired;
-        }
-      }
-
-      for (const block of blocks) {
-        if (consumed.has(block._uid)) continue;
-
-        const req = Number(block.requiredCredits);
-        if (!Number.isFinite(req) || req <= 0) continue;
-
-        required += req;
-
-        if (evaluateBlock(tabName, block).passed) {
-          earned += req;
-        }
-      }
-
-      tabProgressMap[tabName] = {
-        tabName,
-        required,
-        earned,
-        pending: Math.max(required - earned, 0),
-        ratio: required > 0 ? Math.min((earned / required) * 100, 100) : 0
-      };
-    });
-
-    // 其它 = 總學分 - 其他三類應修
-    const otherRequired =
-      (tabProgressMap['全人/校定']?.required || 0) +
-      (tabProgressMap['必修']?.required || 0) +
-      (tabProgressMap['必選']?.required || 0);
-
-    const electiveRequired = Math.max((Number(FRONTEND_RULES.totalRequiredCredits) || 128) - otherRequired, 0);
-
-    let electiveEarned = 0;
-
-    const otherBlocks = getMeaningfulBlocks('其它');
-    for (const block of otherBlocks) {
-      const status = evaluateBlock('其它', block);
+    for (const block of getMeaningfulBlocks('全人/校定')) {
       const req = Number(block.requiredCredits);
-      if (status.passed && Number.isFinite(req) && req > 0) {
-        electiveEarned += req;
+      if (!Number.isFinite(req) || req <= 0) continue;
+      if (!evaluateBlock('全人/校定', block).passed) continue;
+
+      if (isGeneralCoreBlock(block)) {
+        totals.generalCore += req;
+        continue;
+      }
+
+      if (isBasicSkillsBlock(block)) {
+        totals.basicSkills += req;
+        continue;
+      }
+
+      if (isGeneralEducationBlock(block)) {
+        totals.generalEducation += req;
+        continue;
       }
     }
 
-    const otherLooseCourses = getMeaningfulLooseCourses('其它');
-    for (const course of otherLooseCourses) {
+    for (const block of getMeaningfulBlocks('必修')) {
+      const req = Number(block.requiredCredits);
+      if (!Number.isFinite(req) || req <= 0) continue;
+      if (!evaluateBlock('必修', block).passed) continue;
+
+      totals.required += req;
+    }
+
+    for (const block of getMeaningfulBlocks('必選')) {
+      evaluateBlock('必選', block);
+    }
+
+    for (const course of getMeaningfulLooseCourses('其它')) {
       if (usedSubstituteCourseUIDs.has(course._uid)) continue;
       if (!isLooseCoursePassed(course)) continue;
 
-      const credits = Number(course.credits);
-      if (!Number.isFinite(credits) || credits <= 0) continue;
-
-      electiveEarned += credits;
+      if (isDepartmentElectiveCourse(course)) {
+        const credits = Number(course.credits);
+        if (Number.isFinite(credits) && credits > 0) {
+          totals.electives += credits;
+        }
+      }
     }
 
-    tabProgressMap['其它'] = {
-      tabName: '其它',
-      required: electiveRequired,
-      earned: electiveEarned,
-      pending: Math.max(electiveRequired - electiveEarned, 0),
-      ratio: electiveRequired > 0 ? Math.min((electiveEarned / electiveRequired) * 100, 100) : 0
+    progressMap.generalCore = {
+      label: rules.categories.generalCore.label,
+      required: rules.categories.generalCore.required,
+      earned: Math.min(totals.generalCore, rules.categories.generalCore.required)
+    };
+
+    progressMap.basicSkills = {
+      label: rules.categories.basicSkills.label,
+      required: rules.categories.basicSkills.required,
+      earned: Math.min(totals.basicSkills, rules.categories.basicSkills.required)
+    };
+
+    progressMap.generalEducation = {
+      label: rules.categories.generalEducation.label,
+      required: rules.categories.generalEducation.required,
+      earned: Math.min(totals.generalEducation, rules.categories.generalEducation.required)
+    };
+
+    progressMap.required = {
+      label: rules.categories.required.label,
+      required: rules.categories.required.required,
+      earned: Math.min(totals.required, rules.categories.required.required)
+    };
+
+    progressMap.electives = {
+      label: rules.categories.electives.label,
+      required: rules.categories.electives.required,
+      earned: Math.min(totals.electives, rules.categories.electives.required)
     };
 
     const totalEarned =
-      (tabProgressMap['全人/校定']?.earned || 0) +
-      (tabProgressMap['必修']?.earned || 0) +
-      (tabProgressMap['必選']?.earned || 0) +
-      (tabProgressMap['其它']?.earned || 0);
+      progressMap.generalCore.earned +
+      progressMap.basicSkills.earned +
+      progressMap.generalEducation.earned +
+      progressMap.required.earned +
+      progressMap.electives.earned;
 
-    const totalRequired =
-      (tabProgressMap['全人/校定']?.required || 0) +
-      (tabProgressMap['必修']?.required || 0) +
-      (tabProgressMap['必選']?.required || 0) +
-      (tabProgressMap['其它']?.required || 0);
+    progressMap.total = {
+      label: rules.categories.total.label,
+      required: rules.categories.total.required,
+      earned: Math.min(totalEarned, rules.categories.total.required)
+    };
+
+    for (const key of Object.keys(progressMap)) {
+      const item = progressMap[key];
+      item.pending = Math.max(item.required - item.earned, 0);
+      item.ratio = item.required > 0 ? Math.min((item.earned / item.required) * 100, 100) : 0;
+    }
 
     return {
       blockStatusMap,
-      tabProgressMap,
       usedSubstituteCourseUIDs,
+      progressMap,
       summary: {
-        estimatedEarnedCredits: totalEarned,
-        pendingCredits: Math.max(totalRequired - totalEarned, 0)
+        estimatedEarnedCredits: progressMap.total.earned,
+        pendingCredits: progressMap.total.pending
       }
     };
   }
 
   function getRuleModel() {
-    if (!fullData._ruleModel) {
+    if (!fullData?._ruleModel) {
       fullData._ruleModel = computeRuleModel();
     }
     return fullData._ruleModel;
   }
 
+  function getStudentStorageKey() {
+    const year = String(fullData?.meta?.schoolYear || 'unknown');
+    const name = String(fullData?.meta?.name || 'unknown');
+    return `${MANUAL_STATE_KEY}__${year}__${name}`;
+  }
+
+  function getDefaultManualState() {
+    return {
+      subjectAbilityStatus: '',
+      englishGraduationStatus: '',
+      englishTaughtSelected: [],
+      programmingTestStatus: ''
+    };
+  }
+
+  function loadManualState() {
+    if (!fullData) return getDefaultManualState();
+
+    try {
+      const raw = localStorage.getItem(getStudentStorageKey());
+      if (!raw) return getDefaultManualState();
+      return { ...getDefaultManualState(), ...JSON.parse(raw) };
+    } catch {
+      return getDefaultManualState();
+    }
+  }
+
+  function saveManualState(state) {
+    if (!fullData) return;
+    localStorage.setItem(getStudentStorageKey(), JSON.stringify(state));
+  }
+
+  function getManualStateFromInputs() {
+    const checked = Array.from(
+      englishTaughtCourseBox.querySelectorAll('input[type="checkbox"]:checked')
+    ).map(el => el.value);
+
+    return {
+      subjectAbilityStatus: subjectAbilityStatus.value,
+      englishGraduationStatus: englishGraduationStatus.value,
+      englishTaughtSelected: checked,
+      programmingTestStatus: programmingTestStatus.value
+    };
+  }
+
+  function getAllSelectableEnglishTaughtCourses() {
+    if (!fullData) return [];
+
+    const result = [];
+    const seen = new Set();
+
+    for (const [tabName, tab] of Object.entries(fullData.tabs || {})) {
+      for (const block of (tab.blocks || [])) {
+        for (const course of (block.courses || [])) {
+          const credits = Number(block.requiredCredits || course.credits || 0);
+          const score = Number(course.score);
+
+          if (!Number.isFinite(score) || score < 60) continue;
+          if (!Number.isFinite(credits) || credits <= 0) continue;
+
+          const key = course._uid || `${course.courseCode}-${course.semester}-${course.courseName}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+
+          result.push({
+            id: key,
+            courseName: course.courseName || block.sectionName || '未命名課程',
+            semester: course.semester || '-',
+            courseCode: course.courseCode || '-',
+            credits
+          });
+        }
+      }
+
+      for (const course of (tab.looseCourses || [])) {
+        const credits = Number(course.credits || 0);
+        const score = Number(course.score);
+        const flags = course.flags || [];
+
+        if (!Number.isFinite(score) || score < 60) continue;
+        if (!Number.isFinite(credits) || credits <= 0) continue;
+        if (flags.includes('重複') || flags.includes('未完成')) continue;
+
+        const key = course._uid || `${course.courseCode}-${course.semester}-${course.courseName}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+
+        result.push({
+          id: key,
+          courseName: course.courseName || '未命名課程',
+          semester: course.semester || '-',
+          courseCode: course.courseCode || '-',
+          credits
+        });
+      }
+    }
+
+    return result;
+  }
+
+  function renderEnglishTaughtCourseOptions(selectedIds = []) {
+    const courses = getAllSelectableEnglishTaughtCourses();
+
+    if (!courses.length) {
+      englishTaughtCourseBox.innerHTML = `<div class="muted">目前沒有可供勾選的已通過課程。</div>`;
+      return;
+    }
+
+    englishTaughtCourseBox.innerHTML = `
+      <div class="englishCourseList">
+        ${courses.map(course => `
+          <label class="englishCourseItem">
+            <input
+              type="checkbox"
+              value="${escapeHtml(course.id)}"
+              ${selectedIds.includes(course.id) ? 'checked' : ''}
+            />
+            <div class="englishCourseMeta">
+              <div class="title">${escapeHtml(course.courseName)}</div>
+              <div class="sub">${escapeHtml(course.courseCode)}｜${escapeHtml(course.semester)}｜${course.credits} 學分</div>
+            </div>
+          </label>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  function getSelectedEnglishTaughtSummary(selectedIds = []) {
+    const courses = getAllSelectableEnglishTaughtCourses();
+    const picked = courses.filter(course => selectedIds.includes(course.id));
+
+    return {
+      count: picked.length,
+      credits: picked.reduce((sum, course) => sum + Number(course.credits || 0), 0)
+    };
+  }
+
+  function getManualStatus() {
+    const state = getManualStateFromInputs();
+
+    const subjectAbilityPassed = state.subjectAbilityStatus === 'passed';
+    const englishGraduationPassed =
+      state.englishGraduationStatus === 'b2' ||
+      state.englishGraduationStatus === 'selfstudy';
+
+    const englishTaught = getSelectedEnglishTaughtSummary(state.englishTaughtSelected || []);
+    const englishTaughtPassed = englishTaught.count >= 5 || englishTaught.credits >= 15;
+
+    const programmingPassed =
+      state.programmingTestStatus === 'passed' ||
+      state.programmingTestStatus === 'substitute';
+
+    return {
+      subjectAbilityPassed,
+      englishGraduationPassed,
+      englishCount: englishTaught.count,
+      englishCredits: englishTaught.credits,
+      englishTaughtPassed,
+      programmingPassed,
+      allPassed:
+        subjectAbilityPassed &&
+        englishGraduationPassed &&
+        englishTaughtPassed &&
+        programmingPassed
+    };
+  }
+
+  function renderManualPanel() {
+    if (!fullData) {
+      manualWrap.classList.add('hidden');
+      return;
+    }
+
+    manualWrap.classList.remove('hidden');
+
+    const state = loadManualState();
+    subjectAbilityStatus.value = state.subjectAbilityStatus || '';
+    englishGraduationStatus.value = state.englishGraduationStatus || '';
+    programmingTestStatus.value = state.programmingTestStatus || '';
+
+    renderEnglishTaughtCourseOptions(state.englishTaughtSelected || []);
+    updateManualSummary();
+  }
+
+  function updateManualSummary() {
+    const status = getManualStatus();
+
+    manualChips.innerHTML = [
+      `<span class="chip ${status.subjectAbilityPassed ? 'good' : 'warn'}">資訊學科能力檢測 ${status.subjectAbilityPassed ? '已通過' : '未完成'}</span>`,
+      `<span class="chip ${status.englishGraduationPassed ? 'good' : 'warn'}">英文畢業條件 ${status.englishGraduationPassed ? '已完成' : '未完成'}</span>`,
+      `<span class="chip ${status.englishTaughtPassed ? 'good' : 'warn'}">英語授課專業課程 ${status.englishCount}門 / ${status.englishCredits}學分</span>`,
+      `<span class="chip ${status.programmingPassed ? 'good' : 'warn'}">程式語言機測 ${status.programmingPassed ? '已完成' : '未完成'}</span>`
+    ].join('');
+
+    if (status.allPassed) {
+      manualSummaryTitle.textContent = '特殊畢業條件已完成';
+      manualSummaryText.textContent = '目前人工確認項目皆符合資管系 112 版特殊畢業條件。';
+      return;
+    }
+
+    const messages = [];
+    if (!status.subjectAbilityPassed) messages.push('資訊學科學習能力檢測尚未通過');
+    if (!status.englishGraduationPassed) messages.push('英文畢業條件尚未完成');
+    if (!status.englishTaughtPassed) messages.push('英語授課專業課程尚未達 5 門或 15 學分');
+    if (!status.programmingPassed) messages.push('程式語言機測尚未完成');
+
+    manualSummaryTitle.textContent = '特殊畢業條件尚未完成';
+    manualSummaryText.textContent = messages.join('；');
+  }
+
+  function handleManualChange() {
+    saveManualState(getManualStateFromInputs());
+    updateManualSummary();
+  }
+
   function shouldShowTab(tabName) {
     const ruleModel = getRuleModel();
-    const p = ruleModel.tabProgressMap[tabName] || { required: 0, earned: 0 };
-    if (!FRONTEND_RULES.hideEmptyTabs) return true;
-
     const blockCount = getMeaningfulBlocks(tabName).length;
     const looseCount = getMeaningfulLooseCourses(tabName).filter(course => {
       return !ruleModel.usedSubstituteCourseUIDs.has(course._uid);
     }).length;
 
-    return p.required > 0 || p.earned > 0 || blockCount > 0 || looseCount > 0;
+    return blockCount > 0 || looseCount > 0;
   }
 
   function getVisibleTabNames() {
@@ -648,29 +1157,58 @@
   }
 
   connectBtn.addEventListener('click', () => {
+    if (syncTimeout) clearTimeout(syncTimeout);
+
     popupRef = window.open(GUIDE_URL, 'fjuDiagnosisWindow', 'width=1200,height=900');
+
+    if (!popupRef) {
+      statusEl.textContent = '無法開啟官方頁面，請檢查瀏覽器是否封鎖彈出視窗。';
+      return;
+    }
+
     statusEl.textContent = '已開啟官方系統，請登入...';
+
+    syncTimeout = setTimeout(() => {
+      if (!fullData) {
+        statusEl.textContent =
+          '若長時間沒有反應，請檢查：1. 是否已安裝並啟用擴充功能 2. 是否已完成登入 3. 是否被瀏覽器擋住彈出視窗';
+      }
+    }, 10000);
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    if (syncTimeout) clearTimeout(syncTimeout);
+
+    popupRef = window.open(LOGOUT_URL, 'fjuLogoutWindow', 'width=1200,height=900');
+
+    if (!popupRef) {
+      statusEl.textContent = '無法開啟登出頁面，請檢查瀏覽器是否封鎖彈出視窗。';
+      return;
+    }
+
+    statusEl.textContent = '正在登出官方課診系統...';
   });
 
   clearBtn.addEventListener('click', () => {
-    fullData = null;
-    activeTab = '';
-    tabsEl.innerHTML = '';
-    blocksEl.innerHTML = '';
-    progressSection.innerHTML = '';
-    searchInput.value = '';
-    appEl.classList.add('hidden');
-    emptyEl.classList.remove('hidden');
-    statusEl.textContent = '尚未同步';
+    if (syncTimeout) clearTimeout(syncTimeout);
+    resetView();
   });
 
-  function updateSummary(){
+  subjectAbilityStatus.addEventListener('change', handleManualChange);
+  englishGraduationStatus.addEventListener('change', handleManualChange);
+  programmingTestStatus.addEventListener('change', handleManualChange);
+  englishTaughtCourseBox.addEventListener('change', (event) => {
+    if (event.target.matches('input[type="checkbox"]')) {
+      handleManualChange();
+    }
+  });
+
+  function updateSummary() {
     const ruleModel = getRuleModel();
 
     document.getElementById('studentName').textContent = safe(fullData.meta?.name);
     document.getElementById('studentMajor').textContent = safe(fullData.meta?.major);
     document.getElementById('studentYear').textContent = safe(fullData.meta?.schoolYear);
-
     document.getElementById('statEarned').textContent = ruleModel.summary.estimatedEarnedCredits ?? 0;
     document.getElementById('statPending').textContent = ruleModel.summary.pendingCredits ?? 0;
 
@@ -684,7 +1222,6 @@
       for (const block of (tab.blocks || [])) {
         courseCount += (block.courses || []).length;
       }
-
       courseCount += (tab.looseCourses || []).length;
     }
 
@@ -694,31 +1231,36 @@
 
   function renderProgressCards() {
     progressSection.innerHTML = '';
-    const visibleTabs = getVisibleTabNames();
     const ruleModel = getRuleModel();
 
-    for (const tabName of visibleTabs) {
-      const p = ruleModel.tabProgressMap[tabName] || {
-        earned: 0, required: 0, pending: 0, ratio: 0
-      };
+    const order = [
+      'generalCore',
+      'basicSkills',
+      'generalEducation',
+      'required',
+      'electives',
+      'total'
+    ];
 
+    for (const key of order) {
+      const item = ruleModel.progressMap[key];
       const card = document.createElement('div');
       card.className = 'progressCard';
       card.innerHTML = `
         <div class="progressTop">
-          <div class="name">${escapeHtml(tabName)}</div>
-          <div class="num">${p.earned} / ${p.required}</div>
+          <div class="name">${escapeHtml(item.label)}</div>
+          <div class="num">${item.earned} / ${item.required}</div>
         </div>
         <div class="bar">
-          <div class="barFill" style="width:${p.ratio}%"></div>
+          <div class="barFill" style="width:${item.ratio}%"></div>
         </div>
-        <div class="progressMeta">尚缺 ${p.pending} 學分</div>
+        <div class="progressMeta">尚缺 ${item.pending} 學分</div>
       `;
       progressSection.appendChild(card);
     }
   }
 
-  function renderTabs(){
+  function renderTabs() {
     tabsEl.innerHTML = '';
     const visibleTabs = getVisibleTabNames();
 
@@ -729,7 +1271,7 @@
     for (const key of visibleTabs) {
       const btn = document.createElement('button');
       btn.className = 'tab' + (key === activeTab ? ' active' : '');
-      btn.textContent = key;
+      btn.textContent = TAB_DISPLAY_NAMES[key] || key;
       btn.onclick = () => {
         activeTab = key;
         renderTabs();
@@ -739,8 +1281,8 @@
     }
   }
 
-  function blockMatches(block, q){
-    if(!q) return true;
+  function blockMatches(block, q) {
+    if (!q) return true;
     const hay = [
       block.categoryLabel,
       block.sectionName,
@@ -753,8 +1295,8 @@
     return hay.includes(q);
   }
 
-  function looseCourseMatches(course, q){
-    if(!q) return true;
+  function looseCourseMatches(course, q) {
+    if (!q) return true;
     const hay = [
       course.courseCode,
       course.courseName,
@@ -767,7 +1309,7 @@
     return hay.includes(q);
   }
 
-  function renderBlocks(){
+  function renderBlocks() {
     const q = searchInput.value.trim().toLowerCase();
     const tab = fullData.tabs?.[activeTab] || { blocks: [], looseCourses: [] };
     const ruleModel = getRuleModel();
@@ -782,12 +1324,16 @@
         const flags = c.flags || [];
         return !flags.includes('重複');
       })
-      .filter(c => !ruleModel.usedSubstituteCourseUIDs.has(c._uid));
+      .filter(c => !ruleModel.usedSubstituteCourseUIDs.has(c._uid))
+      .filter(c => {
+        if (activeTab !== '其它') return true;
+        return isLooseCoursePassed(c);
+      });
 
     blocksEl.innerHTML = '';
 
-    const p = ruleModel.tabProgressMap[activeTab] || { earned: 0, required: 0 };
-    tabMeta.textContent = `目前分頁：${activeTab}｜檢核項目 ${blocks.length}｜獨立課程 ${looseCourses.length}｜本類已修 ${p.earned}/${p.required}`;
+    const tabLabel = TAB_DISPLAY_NAMES[activeTab] || activeTab;
+    tabMeta.textContent = `目前分頁：${tabLabel}｜檢核項目 ${blocks.length}｜獨立課程 ${looseCourses.length}`;
 
     if (!blocks.length && !looseCourses.length) {
       blocksEl.innerHTML = '<div class="empty">這個分頁沒有符合搜尋條件的資料。</div>';
@@ -795,21 +1341,19 @@
     }
 
     for (const block of blocks) {
-      const div = document.createElement('div');
-      div.className = 'block';
-
-      const choiceGroupName = findChoiceGroupName(activeTab, block);
       const blockStatus = ruleModel.blockStatusMap[block._uid] || {
         passed: false,
         mode: 'none',
         substituteCourses: []
       };
 
+      const div = document.createElement('div');
+      div.className = 'block';
+
       const chips = [
         block.categoryLabel ? `<span class="chip">${escapeHtml(block.categoryLabel)}</span>` : '',
         block.courseType ? `<span class="chip">${escapeHtml(block.courseType)}</span>` : '',
         Number.isFinite(Number(block.requiredCredits)) ? `<span class="chip">${Number(block.requiredCredits)} 學分</span>` : '',
-        choiceGroupName ? `<span class="chip warn">${escapeHtml(choiceGroupName)} 二選一群組</span>` : '',
         blockStatus.mode === 'direct' ? `<span class="chip good">已完成</span>` : '',
         blockStatus.mode === 'substitution' ? `<span class="chip good">替代通過</span>` : '',
         block.note ? `<span class="chip warn">註記 ${escapeHtml(block.note)}</span>` : '',
@@ -870,8 +1414,6 @@
     }
 
     if (looseCourses.length) {
-      const div = document.createElement('div');
-      div.className = 'block';
       const rows = looseCourses.map(c => `
         <tr>
           <td>${escapeHtml(c.courseCode || '-')}</td>
@@ -883,6 +1425,8 @@
         </tr>
       `).join('');
 
+      const div = document.createElement('div');
+      div.className = 'block';
       div.innerHTML = `
         <div class="chips">
           <span class="chip">獨立課程</span>
@@ -900,11 +1444,29 @@
     }
   }
 
-  function renderApp(){
+  function renderManualPanel() {
+    if (!fullData) {
+      manualWrap.classList.add('hidden');
+      return;
+    }
+
+    manualWrap.classList.remove('hidden');
+
+    const state = loadManualState();
+    subjectAbilityStatus.value = state.subjectAbilityStatus || '';
+    englishGraduationStatus.value = state.englishGraduationStatus || '';
+    programmingTestStatus.value = state.programmingTestStatus || '';
+
+    renderEnglishTaughtCourseOptions(state.englishTaughtSelected || []);
+    updateManualSummary();
+  }
+
+  function renderApp() {
     emptyEl.classList.add('hidden');
     appEl.classList.remove('hidden');
     updateSummary();
     renderProgressCards();
+    renderManualPanel();
     renderTabs();
     renderBlocks();
   }
@@ -913,17 +1475,43 @@
     if (fullData) renderBlocks();
   });
 
-  window.addEventListener('message', (event) => {
+  window.addEventListener('message', async (event) => {
     const msg = event.data;
     console.log('index.html 收到 message', msg);
 
-    if (!msg || msg.type !== 'FJU_DIAGNOSIS_DATA') return;
+    if (!msg) return;
+
+    if (msg.type === 'FJU_LOGOUT_DONE') {
+      if (syncTimeout) clearTimeout(syncTimeout);
+      resetView('官方課診系統已登出，可重新連線讓下一位同學登入。');
+
+      if (popupRef && !popupRef.closed) {
+        popupRef.close();
+      }
+      return;
+    }
+
+    if (msg.type !== 'FJU_DIAGNOSIS_DATA') return;
+
+    if (syncTimeout) clearTimeout(syncTimeout);
 
     fullData = normalizeIncomingData(msg.payload);
     fullData._ruleModel = null;
 
+    try {
+      const remoteRule = await fetchRuleFromApi('MIS', 112);
+      ACTIVE_RULES = buildRulesFromApi(remoteRule);
+      ruleSource = 'remote';
+    } catch (err) {
+      console.error('雲端規則載入失敗，改用本地備援規則：', err);
+      ACTIVE_RULES = cloneRules(DEFAULT_RULES);
+      ruleSource = 'local';
+    }
+
+    fullData._ruleModel = null;
+
     statusEl.textContent =
-      `同步完成：${fullData.meta?.name || '-'} / 已估算學分 ${getRuleModel().summary?.estimatedEarnedCredits ?? 0}`;
+      `同步完成：${fullData.meta?.name || '-'} / 已估算學分 ${getRuleModel().summary?.estimatedEarnedCredits ?? 0} / 規則來源：${ruleSource === 'remote' ? '雲端' : '本地備援'}`;
 
     renderApp();
 

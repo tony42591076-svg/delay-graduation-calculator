@@ -3,8 +3,13 @@
 
   const GUIDE_PATH = '/Student/GuidePage';
   const STUDENT_PATH = '/Student/';
+  const LOGIN_PATH = '/Student/Account/Login';
   const STUDENT_URL = 'https://learningcounseling.fju.edu.tw/Student/';
   const TAB_NAMES = ['全人/校定', '必修', '必選', '其它'];
+
+  function getAction() {
+    return new URL(location.href).searchParams.get('bridge_action') || '';
+  }
 
   function cleanText(text = '') {
     return text.replace(/\s+/g, ' ').trim();
@@ -18,13 +23,33 @@
     console.log('[FJU Diagnosis Bridge]', ...args);
   }
 
+  function getText(el) {
+    return cleanText(el?.innerText || el?.textContent || '');
+  }
+
+  function findClickableByText(patterns) {
+    const els = Array.from(document.querySelectorAll('a, button, .nav-link, .dropdown-item, .btn'));
+    return els.find(el => patterns.some(pattern => pattern.test(getText(el))));
+  }
+
   function getActiveTabName() {
     const activeEl =
       document.querySelector('.nav-link.active') ||
-      document.querySelector('.nav-item .active') ||
+      document.querySelector('.nav-item .nav-link.active') ||
+      document.querySelector('.nav-item.active .nav-link') ||
+      document.querySelector('.nav-item.active') ||
       document.querySelector('.active');
 
     return activeEl ? cleanText(activeEl.innerText) : '';
+  }
+
+  function getActiveTabPane() {
+    return (
+      document.querySelector('.tab-pane.show.active') ||
+      document.querySelector('.tab-pane.active') ||
+      document.querySelector('.tab-content .active') ||
+      document
+    );
   }
 
   function parseHeader(text) {
@@ -74,27 +99,34 @@
   function parseCourseLine(text) {
     const cleaned = cleanText(text);
 
-    const normalMatch = cleaned.match(/^(\S+)\s*\/\s*(\d{3}-\d)\s+(.+?)\s+(\d+|未評定成績)$/);
-    if (normalMatch) {
+    let match = cleaned.match(
+      /^(\S+)\s*\/\s*(\d{3}-\d)\s+(.+?)\s+(\d+)\s+(未評定成績|\d+)(?:\s+(.*))?$/
+    );
+
+    if (match) {
       return {
         raw: cleaned,
-        courseCode: cleanText(normalMatch[1]),
-        semester: cleanText(normalMatch[2]),
-        courseName: cleanText(normalMatch[3]),
-        score: cleanText(normalMatch[4])
+        courseCode: cleanText(match[1]),
+        semester: cleanText(match[2]),
+        courseName: cleanText(match[3]),
+        credits: Number(match[4]),
+        score: cleanText(match[5]),
+        flags: match[6] ? cleanText(match[6]).split(/\s+/).filter(Boolean) : []
       };
     }
 
-    const looseMatch = cleaned.match(/^(\S+)\s*\/\s*(\d{3}-\d)\s+(.+?)\s+(\d+)\s+(\d+|未評定成績)(?:\s+(.*))?$/);
-    if (looseMatch) {
+    match = cleaned.match(
+      /^(\S+)\s*\/\s*(\d{3}-\d)\s+(.+?)\s+(未評定成績|\d+)$/
+    );
+
+    if (match) {
       return {
         raw: cleaned,
-        courseCode: cleanText(looseMatch[1]),
-        semester: cleanText(looseMatch[2]),
-        courseName: cleanText(looseMatch[3]),
-        credits: Number(looseMatch[4]),
-        score: cleanText(looseMatch[5]),
-        flags: looseMatch[6] ? cleanText(looseMatch[6]).split(/\s+/).filter(Boolean) : []
+        courseCode: cleanText(match[1]),
+        semester: cleanText(match[2]),
+        courseName: cleanText(match[3]),
+        score: cleanText(match[4]),
+        flags: []
       };
     }
 
@@ -103,13 +135,34 @@
       courseCode: '',
       semester: '',
       courseName: '',
-      score: ''
+      score: '',
+      flags: []
     };
   }
 
   function isLooseCourseRow(text) {
-    const cleaned = cleanText(text);
-    return /^\S+\s*\/\s*\d{3}-\d\s+.+?\s+\d+\s+(\d+|未評定成績)(?:\s+.*)?$/.test(cleaned);
+    const parsed = parseCourseLine(text);
+    return !!(parsed.courseCode && parsed.semester && parsed.courseName);
+  }
+
+  function dedupeLooseCourses(courses) {
+    const map = new Map();
+
+    for (const course of courses) {
+      const key = [
+        course.courseCode || '',
+        course.semester || '',
+        course.courseName || '',
+        String(course.credits ?? ''),
+        course.score || ''
+      ].join('||');
+
+      if (!map.has(key)) {
+        map.set(key, course);
+      }
+    }
+
+    return Array.from(map.values());
   }
 
   function getMeta() {
@@ -126,55 +179,90 @@
     };
   }
 
-  function getBlocksAndLooseCourses() {
-    const items = Array.from(document.querySelectorAll('li.list-group-item'));
+  function extractLineTexts(item) {
+    return (item.innerText || '')
+      .split('\n')
+      .map(cleanText)
+      .filter(Boolean);
+  }
+
+  function extractLooseCoursesFromActivePane() {
+    const root = getActiveTabPane();
+    const text = root.innerText || '';
+    const lines = text
+      .split('\n')
+      .map(cleanText)
+      .filter(Boolean);
+
+    const looseCourses = lines
+      .filter(isLooseCourseRow)
+      .map(parseCourseLine);
+
+    return dedupeLooseCourses(looseCourses);
+  }
+
+  function getBlocksAndLooseCourses(tabName) {
+    const root = getActiveTabPane();
+    const items = Array.from(root.querySelectorAll('li.list-group-item, div.list-group-item'));
     const blocks = [];
-    const looseCourses = [];
+    let looseCourses = [];
+
+    if (tabName === '其它') {
+      looseCourses = extractLooseCoursesFromActivePane();
+      return { blocks, looseCourses };
+    }
 
     items.forEach((item, index) => {
       const headerEl = item.querySelector('div.mt-0.mb-1.text-break');
       const courseEls = Array.from(item.querySelectorAll('div.small.text-muted.text-nowrap'));
+      const lineTexts = extractLineTexts(item);
       const fullText = cleanText(item.innerText || '');
-      const firstLine = cleanText((item.innerText || '').split('\n')[0] || '');
+      const firstLine = lineTexts[0] || '';
 
-      if (!headerEl && courseEls.length === 0 && isLooseCourseRow(firstLine)) {
+      if (headerEl) {
+        const headerText = cleanText(headerEl.innerText || firstLine);
+        const header = parseHeader(headerText);
+
+        if (!header.sectionName) return;
+
+        let courseTexts = [];
+
+        if (courseEls.length > 0) {
+          courseTexts = courseEls
+            .map(el => cleanText(el.innerText))
+            .filter(Boolean);
+        } else {
+          courseTexts = lineTexts.slice(1).filter(isLooseCourseRow);
+        }
+
+        const courses = courseTexts.map(parseCourseLine);
+
+        blocks.push({
+          index,
+          ...header,
+          courses
+        });
+
+        return;
+      }
+
+      if (isLooseCourseRow(fullText)) {
         looseCourses.push({
           index,
-          ...parseCourseLine(firstLine)
+          ...parseCourseLine(fullText)
         });
-        return;
       }
-
-      const headerText = headerEl ? cleanText(headerEl.innerText) : firstLine;
-      const header = parseHeader(headerText);
-
-      if (!header.sectionName) {
-        if (isLooseCourseRow(fullText)) {
-          looseCourses.push({
-            index,
-            ...parseCourseLine(fullText)
-          });
-        }
-        return;
-      }
-
-      const courses = courseEls
-        .map(el => cleanText(el.innerText))
-        .filter(Boolean)
-        .map(parseCourseLine);
-
-      blocks.push({
-        index,
-        ...header,
-        courses
-      });
     });
 
+    looseCourses = dedupeLooseCourses(looseCourses);
     return { blocks, looseCourses };
   }
 
   function findTabElement(tabName) {
-    const candidates = Array.from(document.querySelectorAll('a, button, li, .nav-link, .nav-item'));
+    const candidates = Array.from(
+      document.querySelectorAll('.nav-link, .nav-item .nav-link, a, button')
+    );
+
     return candidates.find(el => cleanText(el.innerText) === tabName);
   }
 
@@ -189,13 +277,16 @@
     }
 
     tabEl.click();
-    await sleep(900);
+    await sleep(1200);
 
     if (getActiveTabName() !== tabName) {
-      await sleep(900);
+      tabEl.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      await sleep(1200);
     }
 
-    return getActiveTabName() === tabName;
+    const ok = getActiveTabName() === tabName;
+    log('切換分頁結果', { target: tabName, current: getActiveTabName(), ok });
+    return ok;
   }
 
   function scoreToNum(score) {
@@ -282,14 +373,19 @@
         continue;
       }
 
-      await sleep(500);
+      await sleep(900);
 
-      const parsed = getBlocksAndLooseCourses();
+      const parsed = getBlocksAndLooseCourses(tabName);
       result.tabs[tabName] = {
         tabName,
         blocks: parsed.blocks,
         looseCourses: parsed.looseCourses
       };
+
+      log(`分頁 ${tabName} 抓取完成`, {
+        blocks: parsed.blocks.length,
+        looseCourses: parsed.looseCourses.length
+      });
     }
 
     if (originalTab && TAB_NAMES.includes(originalTab)) {
@@ -320,8 +416,102 @@
     log('資料已送出');
   }
 
+  async function waitUntilLeaveLoginPage(maxWaitMs = 180000) {
+    const start = Date.now();
+
+    while (Date.now() - start < maxWaitMs) {
+      if (location.pathname !== LOGIN_PATH) {
+        return true;
+      }
+      await sleep(1000);
+    }
+
+    return false;
+  }
+
+  async function performLogoutFlow() {
+    log('進入 logout 模式');
+    await sleep(1500);
+
+    let logoutTrigger = findClickableByText([
+      /登出系統/,
+      /^登出$/,
+      /logout/i
+    ]);
+
+    if (!logoutTrigger) {
+      const userMenuTrigger = document.querySelector('.fa-cog, .fa-user, .dropdown-toggle');
+      if (userMenuTrigger) {
+        userMenuTrigger.click();
+        await sleep(800);
+        logoutTrigger = findClickableByText([
+          /登出系統/,
+          /^登出$/,
+          /logout/i
+        ]);
+      }
+    }
+
+    if (logoutTrigger) {
+      log('找到登出入口，準備點擊');
+      logoutTrigger.click();
+      await sleep(800);
+    } else {
+      log('找不到明顯的登出入口，可能本來就未登入或頁面結構不同');
+    }
+
+    const confirmBtn = findClickableByText([
+      /^登出$/,
+      /確認登出/,
+      /logout/i
+    ]);
+
+    if (confirmBtn) {
+      log('找到登出確認按鈕，準備點擊');
+      confirmBtn.click();
+      await sleep(1500);
+    }
+
+    if (window.opener) {
+      window.opener.postMessage(
+        {
+          type: 'FJU_LOGOUT_DONE'
+        },
+        '*'
+      );
+    }
+
+    await sleep(500);
+    window.close();
+  }
+
   async function init() {
     log('content script 啟動：', location.href);
+
+    const action = getAction();
+
+    if (action === 'logout') {
+      if (
+        location.pathname === GUIDE_PATH ||
+        location.pathname === STUDENT_PATH ||
+        (location.pathname.startsWith('/Student/') && location.pathname !== LOGIN_PATH)
+      ) {
+        await performLogoutFlow();
+        return;
+      }
+    }
+
+    if (location.pathname === LOGIN_PATH) {
+      log('目前在登入頁，等待使用者登入完成...');
+      const leftLogin = await waitUntilLeaveLoginPage();
+
+      if (!leftLogin) {
+        log('等待登入逾時，停止此次同步');
+        return;
+      }
+
+      log('已離開登入頁，新的位置：', location.href);
+    }
 
     if (location.pathname === GUIDE_PATH) {
       log('目前在 GuidePage，準備同頁跳轉到 Student/');
@@ -330,9 +520,12 @@
       return;
     }
 
-    if (location.pathname === STUDENT_PATH || location.pathname.startsWith('/Student/')) {
+    if (
+      location.pathname === STUDENT_PATH ||
+      (location.pathname.startsWith('/Student/') && location.pathname !== LOGIN_PATH)
+    ) {
       log('已進入 Student 頁，準備抓資料');
-      await sleep(1800);
+      await sleep(2200);
       await sendDataToOpener();
     }
   }
